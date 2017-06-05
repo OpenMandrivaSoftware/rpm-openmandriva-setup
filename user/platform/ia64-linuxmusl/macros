@@ -1,0 +1,14 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_arch			ia64
+%_os			linux
+%_gnu			-musl
+%optflags		%{?__common_cflags:%{__common_cflags}}%{!?__common_cflags:-O2 -g}
+
+#==============================================================================
+# ---- configure macros.
+#
+%_lib			lib

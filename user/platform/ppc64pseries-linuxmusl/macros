@@ -1,0 +1,14 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_arch			ppc64pseries
+%_os			linux
+%_gnu			-musl
+%optflags		-g
+
+#==============================================================================
+# ---- configure macros.
+#
+%_lib			lib

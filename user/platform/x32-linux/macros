@@ -1,0 +1,21 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_target_cpu		x86_64
+%_target_platform	x86_64-%{_target_vendor}-linux-gnux32
+%_arch			x86_64
+%_os			linux
+%_gnu			-gnux32
+%optflags		%{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-Os -g} -mx32 -march=atom -mtune=core-avx-i %{?!_disable_lto:-flto}
+
+#==============================================================================
+# ---- configure macros.
+#
+%_lib			libx32
+
+#---------------------------------------------------------------------
+#	Multilibs
+%_multilibno		1
+%_multilibpatt		(/%{_lib}|/usr/%{_lib}(|/gconv)|/usr/local/%{_lib}|/usr/X11R6/%{_lib}|/opt/%{_lib})/[^/]*\\.([oa]|la|so[0-9.]*)$

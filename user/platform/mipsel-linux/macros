@@ -1,0 +1,19 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_arch			mipsel
+%_os			linux
+%_gnu			-gnu
+%optflags		%{?__common_cflags:%{__common_cflags} -march=mips3 -mtune=loongson2f}%{!?__common_cflags:-O2 -g -m32} %{?!_disable_lto:-flto}
+
+#==============================================================================
+# ---- configure macros.
+#
+%_lib			lib
+
+#---------------------------------------------------------------------
+#	Multilibs
+%_multilibno		1
+%_multilibpatt		(/%{_lib}|/usr/%{_lib}(|/gconv)|/usr/local/%{_lib}|/usr/X11R6/%{_lib}|/opt/%{_lib})/[^/]*\\.([oa]|la|so[0-9.]*)$

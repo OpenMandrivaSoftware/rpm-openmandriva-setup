@@ -1,0 +1,19 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_arch			sparc
+%_os			linux
+%_gnu			-gnu
+%optflags		-O2 -g -m32 -mcpu=v7 -mtune=ultrasparc
+
+#==============================================================================
+# ---- configure macros.
+#
+%_lib			lib
+
+#---------------------------------------------------------------------
+#	Multilibs
+%_multilibno		1
+%_multilibpatt		(/%{_lib}|/usr/%{_lib}(|/gconv)|/usr/local/%{_lib}|/usr/X11R6/%{_lib}|/opt/%{_lib})/[^/]*\\.([oa]|la|so[0-9.]*)$

@@ -1,0 +1,19 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_arch			arm
+%_os			linux
+%_gnu			-musleabi
+%optflags		%{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+
+#==============================================================================
+# ---- configure macros.
+#
+%_lib			lib
+
+#---------------------------------------------------------------------
+#	Multilibs
+%_multilibno		1
+%_multilibpatt		(/%{_lib}|/usr/%{_lib}(|/gconv)|/usr/local/%{_lib}|/usr/X11R6/%{_lib}|/opt/%{_lib})/[^/]*\\.([oa]|la|so[0-9.]*)$

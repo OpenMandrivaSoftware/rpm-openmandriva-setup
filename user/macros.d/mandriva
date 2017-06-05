@@ -1,0 +1,543 @@
+%distribution		Mandriva Linux
+%vendor			Mandriva
+%bugurl			http://qa.mandriva.com
+%disturl		http://mandriva.org
+
+# This macro will disable the transaction lock on /var/lib/rpm/__db.*.
+# This lock is of no use to us and will also result in errors when trying to
+# install src.rpms as regular user.
+%_rpmlock_path		%{nil}
+
+%_upgrade_tag		name
+%_obsolete_tag		name
+
+# Disable automatic dependencies on parent directory and symlinks for now
+%_check_symlink_deps	0
+%_check_dirname_deps	0
+
+# The directory where buildroots will be created.
+%_buildrootdir          %{_topdir}/BUILDROOT
+
+# Build root path, where %install installs the package during build.
+%buildroot              %{_buildrootdir}/%{name}-%{version}-%{release}%{?disttag:-%{disttag}%{?distepoch:%{distepoch}}}.%{_target_cpu}-buildroot
+
+%_srcdefattr		(644,root,root)
+# Path to top of build area.
+%_topdir                %(echo $HOME)/rpmbuild
+
+%_docdir_fmt		%%{NAME}
+
+%_changelog_truncate	3 years ago
+
+# mdvbz#64914
+%_rpmgio		.ufdio
+
+%__urlgetfile(url, dest) wget %1 -O %2 || (rm -f %2 && exit 1)
+
+# This will die as soon as remaining usage has been phased out...
+%mkrel(c:)		%{-c: 0.%{-c*}.}%{1}%{?subrel:.%subrel}
+
+# This will enable the use of distepoch and disttag in stead of polluting
+# %release with such.
+%evr_tuple_select	12345
+%evr_tuple_order	EVTRD
+%disttag		%{!?distsuffix:mdv}%{?distsuffix}
+%distepoch		%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
+
+# Dynamic EVRD tags macro for use with versioned provides/requires in place of
+# '%{version}-%{release}', ie. to automatically add distepoch or epoch if present
+%EVRD			%{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}%{?distepoch::%{distepoch}}} 
+
+%rename() \
+Obsoletes:	%{1} < %{?2}%{!?2:%{EVRD}} \
+Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
+
+
+%_default_patch_flags	-U
+%_default_patch_fuzz	0
+
+%apply_patches %{lua:\
+f = io.open(rpm.expand("%{_specfile}"))\
+if f then\
+  for l in f:lines() do\
+    match,b,num = string.find(string.lower(l), "^%s*patch(%d+)%s*:.*$")\
+    if match then print(rpm.expand("%patch"..num.." -p1 -b "..string.format(".%04d~",num).." \\\n")); end\
+  end\
+  f:close()\
+end\
+}
+
+
+%make			%{__make} %{_smp_mflags} -O
+%makeinstall_std	make DESTDIR=%{?buildroot:%{buildroot}} install INSTALL="install -p"
+
+# mdvbz#62322
+%__grep			/bin/grep
+%__gzip			/bin/gzip
+%__lua			%{_bindir}/lua
+%__rc			%{_bindir}/rc
+%__xar			%{_bindir}/xar
+
+# mdvbz#61851
+%__tar_wildcards	--wildcards
+
+%_loop_detection_loglevel 4
+
+
+%_sysconfdir    /etc
+%_defaultdocdir %{_datadir}/doc
+%_localstatedir %{_var}
+%_logdir 	%{_var}/log
+%_sharedstatedir %{_localstatedir}/lib
+
+# mdvbz#62741
+# standard systemd directories
+%_systemdrootdir	/lib/systemd
+%_systemunitdir		%{_systemdrootdir}/system
+%_systemgeneratordir	%{_systemdrootdir}/system-generators
+%_systemshutdowndir	%{_systemdrootdir}/system-shutdown
+
+%_systemddatadir	%{_datadir}/systemd
+%_userunitdir		%{_systemddatadir}/user
+
+%_systemdlibexecdir	%{_libexecdir}/systemd
+%_usergeneratordir	%{_systemdlibexecdir}/user-generators
+
+%_systemdconfdir	%{_sysconfdir}/systemd
+
+#
+# multiarch is used to deal with situations where headers that contain
+# ie. architecture specific parts to solve file conflicts between
+# packages of different archs in multilib environments.
+#
+# Note: more details at http://wiki.mandriva.com/en/Policies/Multiarch
+%multiarch_platform		multiarch-%{_arch}-%{_target_os}
+%multiarch_bindir		%{_bindir}/%{multiarch_platform}
+%multiarch_includedir		%{_includedir}/%{multiarch_platform}
+%multiarch_binaries()		%{_rpmhome}/mkmultiarch binaries %{1}
+%multiarch_includes()		%{_rpmhome}/mkmultiarch includes %{1}
+
+# Check for need of multiarch, terminate build if needed and not used.
+#
+# Note: The default value should be 0 for legacy compatibility.
+# TODO: fix check script and implement support for using
+#%_multiarch_required_terminate_build	1
+
+# use XZ to compress binary packages:
+%_binary_payload			w.xzdio
+%_xz_threads				-1
+
+%_duplicate_files_terminate_build	1
+%_unpackaged_subdirs_terminate_build	1
+%_files_listed_twice_terminate_build	1
+
+%_build_pkgcheck_set /usr/bin/rpmlint -T -f %{_sourcedir}/%{name}.rpmlintrc
+%_build_pkgcheck_srpm /usr/bin/rpmlint -T -f %{_sourcedir}/%{name}.rpmlintrc
+%_nonzero_exit_pkgcheck_terminate_build 1
+
+%_enable_debug_packages 1
+
+
+# Default extension to use (for man & info files)
+%_extension .xz
+%_compress xz -0f --text -T0
+
+
+# Macro: %{mklibname <name> [<major> [<minor>]] [-s] [-d]}
+# - %{mklibname test}               => lib64test, on a lib64 platform
+# - %{mklibname test 1 -d}      => libtest1-devel
+# - %{mklibname test 1 -d 0 -s} => libtest1_0-static-devel
+%mklibname(ds)  %{_lib}%{1}%{!-d:%(if echo %{1} |rev |cut -b1 |grep -q '[0-9]'; then echo -n _; fi)}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}
+
+%debugcflags %{?_enable_debug_packages:-gdwarf-4 -Wstrict-aliasing=2}
+
+# common compilation flags
+
+%_fortify_cflags -D_FORTIFY_SOURCE=2
+
+# cf http://wiki.mandriva.com/en/Development/Packaging/Problems#format_not_a_string_literal_and_no_format_arguments
+%Werror_cflags -Wformat -Werror=format-security
+
+%_ssp_cflags -fstack-protector --param=ssp-buffer-size=4 %{?_serverbuild_flags}
+%__common_cflags -Os %{debugcflags} -pipe %{Werror_cflags} %{?_fortify_cflags}
+%__common_cflags_with_ssp %{__common_cflags} %{?_ssp_cflags}
+
+# Servers opt flags.
+# Also set the env variables for backward compatibility (#32050).
+%serverbuild %define _serverbuild_flags -fstack-protector-all \
+export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export RPM_OPT_FLAGS="%{optflags} -fPIE" \
+%{nil}
+
+# Hardened Servers opt flags.
+%serverbuild_hardened %define _hardened_flags -Wl,-z,now -pie \
+%serverbuild \
+%{nil}
+
+#==============================================================================
+# ---- GPG/PGP/PGP5 signature macros.
+#	Macro(s) to hold the arguments passed to GPG/PGP for package
+#	signing and verification.
+#
+
+#	Verify digest/signature flags for various rpm modes:
+#	0x30300 (_RPMVSF_NODIGESTS)    --nohdrchk      if set, don't check digest(s)
+#	0xc0c00 (_RPMVSF_NOSIGNATURES) --nosignature   if set, don't check signature(s)
+#	0xf0000 (_RPMVSF_NOPAYLOAD)    --nolegacy      if set, check header+payload (if possible)
+#	0x00f00 (_RPMVSF_NOHEADER)     --nohdrchk      if set, don't check rpmdb headers
+%_vsflags_query		0xc0c00
+
+# enable nofsync when rebuilding rpmdb
+%__dbi_rebuild nofsync
+
+#	Open all indices before doing chroot(2).
+#
+%_openall_before_chroot	1
+
+%_repackage_all_erasures	0
+
+# activate filetriggers (cf http://wiki.mandriva.com/en/Rpm_filetriggers)
+%_filetriggers_dir /var/lib/rpm/filetriggers
+
+
+%__gzip			/bin/gzip
+
+%_sys_macros_dir %{_sysconfdir}/rpm/macros.d
+%build_sysmacrospath() %{_sys_macros_dir}/%{?1:%{1}}%{?!1:%{name}}.macros
+
+# when %_with_git_repository is set, these macros modify the behaviour of "%prep" step:
+%_after_setup %{?_with_git_repository:GIT_URL="%{?git_url}" GIT_REPOSITORY_CACHE=%{?git_repository_cache} /usr/lib/rpm/git-repository--after-tarball}
+%_patch %{?_with_git_repository:PKG_NAME=%{name} /usr/lib/rpm/git-repository--apply-patch}%{?!_with_git_repository:%__patch --fuzz=%{_default_patch_fuzz} %{_default_patch_flags}}
+
+# used by "git-repository--after-tarball":
+%git_repository_cache %{_topdir}/%{name}.git
+
+
+# Various programs used in rpm scripts
+%_update_desktop_database_bin %{_bindir}/update-desktop-database
+%_update_mime_database_bin %{_bindir}/update-mime-database
+%_update_icon_cache_bin %{_bindir}/gtk-update-icon-cache
+%_gconftool_bin %{_bindir}/gconftool-2
+%_scrollkeeper_bin %{_bindir}/scrollkeeper-update
+
+#==============================================================================
+# ---- Required rpmrc macros.
+#	Macros that used to be initialized as a side effect of rpmrc parsing.
+#	These are the default values that can be overridden by other
+#	(e.g. per-platform, per-system, per-packager, per-package) macros.
+#
+
+%debug_package_and_restore %{debug_package} \
+%package __restore__\
+Summary: %{summary}\
+Group: %{group}\
+%description __restore__
+
+%_arch_tag_suffix %([ "%{?_lib}" = "lib64" ] && echo "()(64bit)")
+%arch_tagged() %{1}%{_arch_tag_suffix} %{?2:%{2} %{3}%{?!3:%{error:undefined 3rd argument in arch_tagged}}}
+
+# Games macros
+%_gamesdir	games
+%_gamesbindir   %{_prefix}/%{_gamesdir}
+%_gamesdatadir  %{_datadir}/%{_gamesdir}
+
+# Icon directories
+%_iconsdir %{_datadir}/icons
+%_miconsdir %{_datadir}/icons/mini
+%_liconsdir %{_datadir}/icons/large
+
+%_xfontdir %_datadir/fonts
+
+%_webconfdir %{_sysconfdir}/httpd/conf
+%_webappconfdir %_webconfdir/webapps.d
+
+#==============================================================================
+# ---- Build configuration macros.
+#
+# Package version macro.
+#	The type of package to produce, for compatibility with legacy
+#	versions of rpm.
+#
+# Script gets packaged file list on input.
+# Returns list of multiarch files that are not marked as such,
+# i.e. files in $RPM_BUILD_ROOT that have arch-dependent values
+#
+# Note: Disable (by commenting out) for legacy compatibility.
+#%__check_multiarch_files /usr/lib/rpm/check-multiarch-files %{buildroot}
+
+# Use internal dependency generator rather than external helpers?
+%_use_internal_dependency_generator	1
+
+# Update Window Managers session.
+%_fndsession_bin %{_sbindir}/fndSession
+%make_session %{nil}
+%make_dm_session if [ -x %{_fndsession_bin} ]; then %{_fndsession_bin} || true ; fi \
+%{nil}
+
+# For rebuilding gcj-db
+%_rebuildgcjdb_bin %{_bindir}/rebuild-gcj-db
+%update_gcjdb if [ -x %{_rebuildgcjdb_bin} ]; then %{_rebuildgcjdb_bin} || true ; fi \
+%{nil}
+
+%clean_gcjdb if [ -x %{_rebuildgcjdb_bin} ]; then %{_rebuildgcjdb_bin} || true ; fi \
+%{nil}
+
+# Rebuild icon cache
+%update_icon_cache() if [ -x %{_update_icon_cache_bin} ]; then \
+%{_update_icon_cache_bin} --force --quiet %{_iconsdir}/%{1} || true; fi \
+%{nil}
+
+%clean_icon_cache() if [ -x %{_update_icon_cache_bin} -a -r %{_iconsdir}/%{1}/index.theme ]; then \
+%{_update_icon_cache_bin} --force --quiet %{_iconsdir}/%{1} || true ; fi \
+%{nil}
+
+# GConf schemas:
+# installation is handled by filetriggers
+%post_install_gconf_schemas() %{nil}
+# but uninstall still need to be done in %preun:
+%preun_uninstall_gconf_schemas() if [ "$1" = "0" -a -x %{_gconftool_bin} ]; then \
+SCHEMAS="" \
+for SCHEMA in %{*} ; do \
+  SCHEMAS="$SCHEMAS %{_sysconfdir}/gconf/schemas/$SCHEMA.schemas" \
+done \
+GCONF_CONFIG_SOURCE=`%{_gconftool_bin} --get-default-source` %{_gconftool_bin} --makefile-uninstall-rule  $SCHEMAS > /dev/null || true ; fi \
+%{nil}
+
+# Mandriva Linux version
+# - "9.1"    =>  910
+# - "10.2.2" => 1022
+# (user may copy the following line in specfile)
+%mdkversion		%(cat /etc/os-release|grep VERSION_ID= |sed -e 's,.*=,,;s,\",,g;s,\\.,0,g')
+
+#==============================================================================
+# ---- Build policy macros.
+#
+#---------------------------------------------------------------------
+#   Expanded at end of %install scriptlet.
+#
+
+%__os_install_post    \
+    %{?__spec_helper_post}%{?!__spec_helper_post:/usr/share/spec-helper/spec-helper} \
+%{nil}
+
+%__os_stringbuf_post    \
+    %{?__spec_helper_stringbuf_post} \
+%{nil}
+
+#==============================================================================
+# ---- specfile macros.
+#	Macro(s) here can be used reliably for reproducible builds.
+#	(Note: Above is the goal, below are the macros under development)
+#
+
+%__libtoolize_configure %{?__libtoolize:(cd $CONFIGURE_TOP; [ ! -f configure.in -a ! -f configure.ac ] || %{__libtoolize} --copy --force)}
+
+%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
+
+%setup_compile_flags \
+  CC="${CC:-%__cc}" ; export CC ; \
+  CXX="${CXX:-%__cxx}" ; export CXX ; \
+  CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ; \
+  CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ; \
+  FFLAGS="${FFLAGS:-%optflags}" ; export FFLAGS ; \
+  %{?ldflags:LDFLAGS="${LDFLAGS:-%{ldflags}}"; export LDFLAGS ;} \
+%if %{cross_compiling} \
+    PKG_CONFIG_PATH=/usr/%{_target_platform}/sys-root%{_libdir}/pkgconfig:/usr/%{_target_platform}/sys-root%{_datadir}/pkgconfig:%{_libdir}/pkgconfig:%{_datadir}/pkgconfig:$PKG_CONFIG_PATH; export PKG_CONFIG_PATH; \
+%ifnarch noarch \
+    CROSSCOMPILE="%{?!noconftarget:--target=%{_target_platform}} %{?!noconfhost:--host=%{_target_platform}} %{?!noconfbuild:--build=%{_build}}" ; \
+%endif \
+%else \
+%ifnarch noarch \
+    CROSSCOMPILE="%{?!noconftarget:--target=%{_target_platform}} %{?!noconfbuild:--build=%{_target_platform}}" ; \
+%endif \
+%endif \
+  %{?cross:CROSSCOMPILE="%{?!noconftarget:--target=%{cross}} %{?!noconfhost:--host=%{_target_platform}} %{?!noconfbuild:--build=%{_build}}" ; } \
+  export CROSSCOMPILE ; \
+  %{nil}
+
+%config_update \
+  find . -name config.guess -o -name config.sub | while read i ; do \
+           [ -f /usr/share/libtool/config/"$(basename \"$i\")" ] && /bin/rm -f "$i" && /bin/cp -fv /usr/share/libtool/config/"$(basename \"$i\")" "$i" ; \
+  done ; \
+  %{!?_disable_rebuild_configure:if [ -e configure.ac -a -e Makefile.am ]; then \
+    find . -name configure.ac |xargs dirname |while read D; do \
+      pushd $D; \
+      if grep -qE '(LT_INIT|LIBTOOL)' configure.ac >/dev/null; then \
+        libtoolize --force ; \
+      fi ; \
+      aclocal $((find . -name "*.m4" 2>/dev/null |grep -vE 'ac(local|include).m4' | xargs dirname) | grep -v '^\.$' |sort |uniq |cut -d/ -f2- |while read R; do [ -e $R/configure.ac ] || echo -n "-I$R "; done) ; \
+      automake -a --foreign ; \
+      autoconf ; \
+      popd ; \
+    done ; \
+  fi ;} \
+  %{nil}
+
+%before_configure \
+  %config_update \
+  %setup_compile_flags \
+  CONFIGURE_TOP="${CONFIGURE_TOP:-.}"
+
+# This is an improved version of %configure (from PLD team).
+%configure \
+  %before_configure ; \
+  %{?_enable_libtoolize:%{?__libtoolize_configure:%{__libtoolize_configure};}} \
+  [ -f $CONFIGURE_TOP/configure.in -o -f $CONFIGURE_TOP/configure.ac ] && \
+  CONFIGURE_XPATH="--x-includes=%{_prefix}/include --x-libraries=%{_prefix}/%{_lib}" \
+  $CONFIGURE_TOP/configure $CROSSCOMPILE \\\
+	--disable-static \\\
+  	--disable-silent-rules \\\
+	--disable-dependency-tracking \\\
+	--disable-rpath \\\
+	--program-prefix=%{?_program_prefix} \\\
+ 	--prefix=%{_prefix} \\\
+	--exec-prefix=%{_exec_prefix} \\\
+	--bindir=%{_bindir} \\\
+	--sbindir=%{_sbindir} \\\
+	--sysconfdir=%{_sysconfdir} \\\
+	--datadir=%{_datadir} \\\
+	--includedir=%{_includedir} \\\
+	--libdir=%{_libdir} \\\
+	--libexecdir=%{_libexecdir} \\\
+	--localstatedir=%{_localstatedir} \\\
+	--sharedstatedir=%{_sharedstatedir} \\\
+	--mandir=%{_mandir} \\\
+	--infodir=%{_infodir} \\\
+    $CONFIGURE_XPATH
+
+%configure2_5x \
+  echo "%%configure2_5x is deprecated, please update the spec to use %%configure instead"; \
+  %configure
+
+%old_makeinstall \
+    make \\\
+	prefix=%{?buildroot:%{buildroot}}%{_prefix} \\\
+	exec_prefix=%{?buildroot:%{buildroot}}%{_exec_prefix} \\\
+	bindir=%{?buildroot:%{buildroot}}%{_bindir} \\\
+	sbindir=%{?buildroot:%{buildroot}}%{_sbindir} \\\
+	sysconfdir=%{?buildroot:%{buildroot}}%{_sysconfdir} \\\
+	datadir=%{?buildroot:%{buildroot}}%{_datadir} \\\
+	includedir=%{?buildroot:%{buildroot}}%{_includedir} \\\
+	libdir=%{?buildroot:%{buildroot}}%{_libdir} \\\
+	libexecdir=%{?buildroot:%{buildroot}}%{_libexecdir} \\\
+	localstatedir=%{?buildroot:%{buildroot}}%{_localstatedir} \\\
+	sharedstatedir=%{?buildroot:%{buildroot}}%{_sharedstatedir} \\\
+	mandir=%{?buildroot:%{buildroot}}%{_mandir} \\\
+	infodir=%{?buildroot:%{buildroot}}%{_infodir} \\\
+    install
+
+
+%perl_convert_version() %(perl -Mversion -le '
+	$x = "%{1}";
+	$y = $x;
+	$x =~ s/[[:alpha:]]*$//;
+	$y =~ s/^$x//;
+	$x =~ s/\D*$//;
+	$v = version->new($x)->normal;
+	$v =~ s/^v//;
+	print "$v$y";
+')
+
+# kept for compatibility, but should not be used, especially the ugly perl_archlib!
+%perl_sitearch	%(eval "`perl -V:installsitearch`"; echo $installsitearch)
+%perl_archlib	%(eval "`perl -V:installarchlib`"; echo $installarchlib)
+
+#--------------------------------------------------------------------------------
+# Macro from conectiva
+
+# Shorthand for %{defined with_...}
+# macros provided by rpm 4.4, but buggy :(
+%_with() %{expand: %%{?_with_%1:1} %%{!?_with_%1: %%{?_without_%1:0} %%{!?_without_%1: %%{?with_%1:%%{with_%1}} %%{!?with_%1: %%{?without_%1:!%%{without_%1}} %%{!?without_%1: %%{?2:%%2} %%{!?2:1} } } } } }
+%_without() !%{expand: %%{with %1 %{?2:%2}}}
+
+%_package_i18n(g:f:) \
+%%package -n %{?1:%{1}}%{?!1:%{name}}-i18n\
+Summary: Internationalization and locale data for %{?1:%{1}}%{?!1:%{name}}\
+License: %{license}\
+Group: %{?-g:%{-g*}}%{?!-g:%{group}}\
+\
+%%description -n %{?1:%{1}}%{?!1:%{name}}-i18n\
+Internationalization and locale data for %{?1:%{1}}%{?!1:%{name}}\
+\
+%%files -n %{?1:%{1}}%{?!1:%{name}}-i18n %{?-f:%{-f}}%{?!-f:-f %{?1:%{1}}%{?!1:%{name}}.lang}\
+%{nil}
+
+
+#------------------------------------------------------------------------------
+# Ocaml macro
+#
+
+%ocaml_sitelib %(if [ -x /usr/bin/ocamlc ]; then ocamlc -where;fi)/site-lib
+
+#------------------------------------------------------------------------------
+# Redefine RPM sections to allow jumping over them using "--without <section>".
+# This an interesting alternative to --short-circuit.
+# The following are mostly equivalent:
+# % rpmbuild -bi --short-circuit foo.spec && rpmbuild -bb --short-circuit foo.spec
+# % rpmbuild -bb --without build foo.spec
+
+%prep %%prep \
+[ %{_with prep} -eq 1 ] || exit 0 \
+[ %{_with build} -eq 1 ] || exit 0 \
+[ %{_with install} -eq 1 ] || exit 0 \
+%{nil}
+
+%build %%build \
+[ %{_with install} -eq 1 ] || exit 0 \
+[ %{_with build} -eq 1 ] || exit 0 \
+%{nil}
+
+%install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package_and_restore}}}\
+%%install\
+[ %{_with install} -eq 1 ] || exit 0 \
+%{nil}
+
+%check %%check \
+[ %{_with check} -eq 1 ] || exit 0 \
+%{nil}
+
+%libpackage()\
+%%package -n %{expand:%%mklibname %{1} %{2} %{?3:%{3}}}\
+Summary: The %{1} library, a part of %{name}\
+Group: System/Libraries\
+%%description -n %{expand:%%mklibname %{1} %{2} %{?3:%{3}}}\
+The %{1} library, a part of %{name}\
+%%files -n %{expand:%%mklibname %{1} %{2} %{?3:%{3}}}\
+%{_libdir}/lib%{1}%{?3:-%{2}}.so.%{?3:%{3}}%{?!3:%{2}}*\
+%{nil}
+
+%dependinglibpackage()\
+%%package -n %{expand:%%mklibname %{1} %{2} %{?3:%{3}}}\
+Summary: The %{1} library, a part of %{name}\
+Group: System/Libraries\
+Requires: %{name} = %{EVRD}\
+%%description -n %{expand:%%mklibname %{1} %{2} %{?3:%{3}}}\
+The %{1} library, a part of %{name}\
+%%files -n %{expand:%%mklibname %{1} %{2} %{?3:%{3}}}\
+%{_libdir}/lib%{1}%{?3:-%{2}}.so.%{?3:%{3}}%{?!3:%{2}}*\
+%{nil}
+
+# get dependencies from library that foo.so points to, very convenient if
+# one wants to ie. generate requires/suggests against libraries that are
+# dlopen()'ed.
+# First argument specifies library name without .so extension and lib prefix,
+# while the optional second argument can be used to specify different library
+# path than %%{_libdir}
+%dlopen_req() %{shrink:\
+%([ -e %{?!2:%{_libdir}}%{?2}/lib%{1}.so ] && \
+rpm -qf --fileprovide $(readlink -f %{?!2:%{_libdir}}%{?2}/lib%{1}.so) 2>/dev/null | \
+grep $(readlink -f %{?!2:%{_libdir}}%{?2}/lib%{1}.so) | cut -f2 || echo %{name})}
+
+# get soname of libfoo.so
+# usage:
+# %%{lib_soname intl} expands to libintl.so.8
+#
+# default library search path is %%{_libdir}, which you can override with an
+# optional second argument:
+# %%{lib_soname intl %%{uclibc_root}%%{_libdir}}
+
+%lib_soname() %(\
+[ -e %{?!2:%{_libdir}}%{?2}/lib%{1}.so ] && \
+objdump -p %{?!2:%{_libdir}}%{?2}/lib%{1}.so | grep -e SONAME | sed -e 's#.*\\\(lib.*\\\)\$#\\\1#g'\
+)
+
+%{load:/etc/rpm/macros.d/*.macros}
