@@ -3,7 +3,7 @@
 # %{load:%{_usrlibrpm}/macros.d/perl}
 #
 
-%__perl			/usr/bin/perl
+%__perl		/usr/bin/perl
 
 # Path to scripts to autogenerate perl package dependencies,
 #

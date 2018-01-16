@@ -11,6 +11,9 @@ test -x $pkgconfig || {
     exit 0
 }
 
+# Under pkgconf, disables dependency resolver
+export PKG_CONFIG_MAXIMUM_TRAVERSE_DEPTH=1
+
 case $1 in
 -P|--provides)
     while read filename ; do
