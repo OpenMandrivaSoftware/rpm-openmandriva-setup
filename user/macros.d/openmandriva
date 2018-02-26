@@ -55,18 +55,6 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %_default_patch_flags	-U
 %_default_patch_fuzz	0
 
-%apply_patches %{lua:\
-f = io.open(rpm.expand("%{_specfile}"))\
-if f then\
-  for l in f:lines() do\
-    match,b,num = string.find(string.lower(l), "^%s*patch(%d+)%s*:.*$")\
-    if match then print(rpm.expand("%patch"..num.." -p1 -b "..string.format(".%04d~",num).." \\\n")); end\
-  end\
-  f:close()\
-end\
-}
-
-
 %make			%{__make} %{_smp_mflags} -O
 %makeinstall_std	make DESTDIR=%{?buildroot:%{buildroot}} install INSTALL="install -p"
 
@@ -102,24 +90,6 @@ end\
 %_usergeneratordir	%{_systemdlibexecdir}/user-generators
 
 %_systemdconfdir	%{_sysconfdir}/systemd
-
-#
-# multiarch is used to deal with situations where headers that contain
-# ie. architecture specific parts to solve file conflicts between
-# packages of different archs in multilib environments.
-#
-# Note: more details at http://wiki.mandriva.com/en/Policies/Multiarch
-%multiarch_platform		multiarch-%{_arch}-%{_target_os}
-%multiarch_bindir		%{_bindir}/%{multiarch_platform}
-%multiarch_includedir		%{_includedir}/%{multiarch_platform}
-%multiarch_binaries()		%{_rpmhome}/mkmultiarch binaries %{1}
-%multiarch_includes()		%{_rpmhome}/mkmultiarch includes %{1}
-
-# Check for need of multiarch, terminate build if needed and not used.
-#
-# Note: The default value should be 0 for legacy compatibility.
-# TODO: fix check script and implement support for using
-#%_multiarch_required_terminate_build	1
 
 # use XZ to compress binary packages:
 %_binary_payload			w.xzdio
@@ -249,17 +219,6 @@ Group: %{group}\
 #==============================================================================
 # ---- Build configuration macros.
 #
-# Package version macro.
-#	The type of package to produce, for compatibility with legacy
-#	versions of rpm.
-#
-# Script gets packaged file list on input.
-# Returns list of multiarch files that are not marked as such,
-# i.e. files in $RPM_BUILD_ROOT that have arch-dependent values
-#
-# Note: Disable (by commenting out) for legacy compatibility.
-#%__check_multiarch_files /usr/lib/rpm/check-multiarch-files %{buildroot}
-
 # Use internal dependency generator rather than external helpers?
 %_use_internal_dependency_generator	1
 
@@ -267,14 +226,6 @@ Group: %{group}\
 %_fndsession_bin %{_sbindir}/fndSession
 %make_session %{nil}
 %make_dm_session if [ -x %{_fndsession_bin} ]; then %{_fndsession_bin} || true ; fi \
-%{nil}
-
-# For rebuilding gcj-db
-%_rebuildgcjdb_bin %{_bindir}/rebuild-gcj-db
-%update_gcjdb if [ -x %{_rebuildgcjdb_bin} ]; then %{_rebuildgcjdb_bin} || true ; fi \
-%{nil}
-
-%clean_gcjdb if [ -x %{_rebuildgcjdb_bin} ]; then %{_rebuildgcjdb_bin} || true ; fi \
 %{nil}
 
 # Rebuild icon cache
@@ -432,10 +383,6 @@ GCONF_CONFIG_SOURCE=`%{_gconftool_bin} --get-default-source` %{_gconftool_bin} -
 	$v =~ s/^v//;
 	print "$v$y";
 ')
-
-# kept for compatibility, but should not be used, especially the ugly perl_archlib!
-%perl_sitearch	%(eval "`perl -V:installsitearch`"; echo $installsitearch)
-%perl_archlib	%(eval "`perl -V:installarchlib`"; echo $installarchlib)
 
 #--------------------------------------------------------------------------------
 # Macro from conectiva
