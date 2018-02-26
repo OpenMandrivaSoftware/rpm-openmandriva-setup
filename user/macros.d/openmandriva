@@ -15,15 +15,7 @@
 %_check_symlink_deps	0
 %_check_dirname_deps	0
 
-# The directory where buildroots will be created.
-%_buildrootdir          %{_topdir}/BUILDROOT
-
-# Build root path, where %install installs the package during build.
-%buildroot              %{_buildrootdir}/%{name}-%{version}-%{release}%{?disttag:-%{disttag}%{?distepoch:%{distepoch}}}.%{_target_cpu}-buildroot
-
 %_srcdefattr		(644,root,root)
-# Path to top of build area.
-%_topdir                %(echo $HOME)/rpmbuild
 
 %_docdir_fmt		%%{NAME}
 
@@ -37,16 +29,14 @@
 # This will die as soon as remaining usage has been phased out...
 %mkrel(c:)		%{-c: 0.%{-c*}.}%{1}%{?subrel:.%subrel}
 
-# This will enable the use of distepoch and disttag in stead of polluting
-# %release with such.
-%evr_tuple_select	12345
-%evr_tuple_order	EVTRD
-%disttag		%{!?distsuffix:mdv}%{?distsuffix}
+%evr_tuple_select	1234
+%evr_tuple_order	EVTR
+%disttag		%{!?distsuffix:omv}%{?distsuffix}
 %distepoch		%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
 
 # Dynamic EVRD tags macro for use with versioned provides/requires in place of
 # '%{version}-%{release}', ie. to automatically add distepoch or epoch if present
-%EVRD			%{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}%{?distepoch::%{distepoch}}}
+%EVRD			%{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}
 
 %rename() \
 Obsoletes:	%{1} < %{?2}%{!?2:%{EVRD}} \
@@ -58,9 +48,6 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %make			%{__make} %{_smp_mflags} -O
 %makeinstall_std	make DESTDIR=%{?buildroot:%{buildroot}} install INSTALL="install -p"
 
-# mdvbz#62322
-%__grep			/bin/grep
-%__gzip			/bin/gzip
 %__lua			%{_bindir}/lua
 %__rc			%{_bindir}/rc
 %__xar			%{_bindir}/xar
@@ -69,12 +56,6 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %__tar_wildcards	--wildcards
 
 %_loop_detection_loglevel 4
-
-%_sysconfdir    /etc
-%_defaultdocdir %{_datadir}/doc
-%_localstatedir %{_var}
-%_logdir 	%{_var}/log
-%_sharedstatedir %{_localstatedir}/lib
 
 # mdvbz#62741
 # standard systemd directories
@@ -92,7 +73,7 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %_systemdconfdir	%{_sysconfdir}/systemd
 
 # use XZ to compress binary packages:
-%_binary_payload			w.xzdio
+%_binary_payload			w5.xzdio
 %_xz_threads				-1
 
 %_duplicate_files_terminate_build	1
@@ -163,9 +144,6 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 
 # activate filetriggers (cf http://wiki.mandriva.com/en/Rpm_filetriggers)
 %_filetriggers_dir /var/lib/rpm/filetriggers
-
-
-%__gzip		/bin/gzip
 
 %_sys_macros_dir %{_sysconfdir}/rpm/macros.d
 %build_sysmacrospath() %{_sys_macros_dir}/%{?1:%{1}}%{?!1:%{name}}.macros
