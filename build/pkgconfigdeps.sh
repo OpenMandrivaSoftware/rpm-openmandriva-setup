@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkgconfig=`which pkg-config`
+pkgconfig="$which pkg-config)"
 test -x $pkgconfig || {
     cat > /dev/null
     exit 0
@@ -21,10 +21,10 @@ case $1 in
     *.pc)
 	if [[ "$(dirname ${filename})" =~ pkgconfig ]]; then
 	    # Query the dependencies of the package.
-	    DIR=`dirname ${filename}`
+	    DIR="$(dirname ${filename})"
 	    PKG_CONFIG_PATH="$DIR:$DIR/../../share/pkgconfig"
 	    export PKG_CONFIG_PATH
-	    $pkgconfig --print-provides "$filename" | while read n r v ; do
+	    "$pkgconfig" --print-provides "$filename" | while read n r v ; do
 		[ -n "$n" ] || continue
 		# We have a dependency.  Make a note that we need the pkgconfig
 		# tool for this package.
@@ -45,10 +45,10 @@ case $1 in
     *.pc)
 	if [[ "$(dirname ${filename})" =~ pkgconfig ]]; then
 	    # Query the dependencies of the package.
-	    DIR=`dirname ${filename}`
+	    DIR="$dirname ${filename})"
 	    PKG_CONFIG_PATH="$DIR:$DIR/../../share/pkgconfig"
 	    export PKG_CONFIG_PATH
-	    $pkgconfig --print-requires --print-requires-private "$filename" | while read n r v ; do
+	    "$pkgconfig" --print-requires --print-requires-private "$filename" | while read n r v ; do
 		[ -n "$n" ] || continue
 		if  [ -n "$r" ] && [ -n "$v" ]; then
 		    echo "pkgconfig($n) $r $v"

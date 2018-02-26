@@ -5,7 +5,7 @@
 # Author(s):	Danny Tholen <obiwan@mandriva.org>
 #	     	Olivier Blin <blino@mandriva.org>
 #		Per Øyvind Karlsen <peroyvind@mandriva.org>
-# 
+#
 
 provides=0
 requires=0

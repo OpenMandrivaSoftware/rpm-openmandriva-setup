@@ -2,7 +2,7 @@
 # To make use of these macros insert the following line into your spec file:
 # %{load:%{_usrlibrpm}/macros.d/kernel}
 
-%__modinfo		/sbin/modinfo
+%__modinfo /sbin/modinfo
 
 # Path to scripts to autogenerate gstreamer package dependencies,
 #
