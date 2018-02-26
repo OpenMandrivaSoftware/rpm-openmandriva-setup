@@ -36,7 +36,7 @@
 
 # Dynamic EVRD tags macro for use with versioned provides/requires in place of
 # '%{version}-%{release}', ie. to automatically add distepoch or epoch if present
-%EVRD			%{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}
+%EVRD			%{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}}
 
 %rename() \
 Obsoletes:	%{1} < %{?2}%{!?2:%{EVRD}} \
