@@ -1,0 +1,36 @@
+include: /usr/lib/rpm/rpmrc
+
+#############################################################
+# Values for RPM_OPT_FLAGS for various platforms
+
+optflags: aarch64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
+
+optflags: armv6j %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv6j -mfpu=vfp -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
+optflags: armv7hl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_neon:-mfpu=neon} %{?!_disable_lto:-flto}
+optflags: armv7hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=hard -mfpu=neon}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: armv7l %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: armv8hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv8-a -mfloat-abi=hard -mfpu=neon}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+
+optflags: i386 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i386 -mtune=generic -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
+optflags: i486 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i486 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
+optflags: i586 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer -mtune=atom}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i586 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
+optflags: i686 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32 -mtune=generic} -march=i686 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
+
+optflags: ia64 %{?__common_cflags:%{__common_cflags}}%{!?__common_cflags:-O2 -g}
+
+optflags: mips %{?__common_cflags:%{__common_cflags} -march=mips3}%{!?__common_cflags:-O2 -g -m32} %{?!_disable_lto:-flto}
+optflags: mipsel %{?__common_cflags:%{__common_cflags} -march=mips3 -mtune=loongson2f}%{!?__common_cflags:-O2 -g -m32} %{?!_disable_lto:-flto}
+
+optflags: ppc -O2 -g -m32 %{?!_disable_lto:-flto}
+optflags: ppc64 -O2 -g -m64 -mminimal-toc %{?!_disable_lto:-flto}
+
+optflags: x86_64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-O2 -g -m64 -mtune=generic} %{?!_disable_lto:-flto}
+
+#############################################################
+# For a given uname().machine, the default build arch
+
+buildarchtranslate: athlon: i586
+buildarchtranslate: geode: i586
+buildarchtranslate: pentium4: i586
+buildarchtranslate: pentium3: i586
+buildarchtranslate: i586: i586
