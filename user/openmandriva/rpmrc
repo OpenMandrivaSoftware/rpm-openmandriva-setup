@@ -14,7 +14,7 @@ optflags: armv8hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC
 optflags: i386 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i386 -mtune=generic -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 optflags: i486 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i486 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 optflags: i586 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer -mtune=atom}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i586 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
-optflags: i686 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32 -mtune=generic} -march=i686 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
+optflags: i686 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32 -mtune=generic} -march=i686 -sse -mfpmath=sse -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 
 optflags: ia64 %{?__common_cflags:%{__common_cflags}}%{!?__common_cflags:-O2 -g}
 
@@ -29,8 +29,8 @@ optflags: x86_64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%
 #############################################################
 # For a given uname().machine, the default build arch
 
-buildarchtranslate: athlon: i586
-buildarchtranslate: geode: i586
-buildarchtranslate: pentium4: i586
-buildarchtranslate: pentium3: i586
-buildarchtranslate: i586: i586
+buildarchtranslate: athlon: i686
+buildarchtranslate: geode: i686
+buildarchtranslate: pentium4: i686
+buildarchtranslate: pentium3: i686
+buildarchtranslate: i586: i686
