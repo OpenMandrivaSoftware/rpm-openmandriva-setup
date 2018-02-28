@@ -19,7 +19,8 @@
 
 %_docdir_fmt		%%{NAME}
 
-%_changelog_truncate	3 years ago
+# automatic truncation of changelogs to 3 years
+%_changelog_trimtime	%{lua:print(os.time() - 3 * 365 * 86400)}
 
 # mdvbz#64914
 %_rpmgio		.ufdio
@@ -29,10 +30,14 @@
 # This will die as soon as remaining usage has been phased out...
 %mkrel(c:)		%{-c: 0.%{-c*}.}%{1}%{?subrel:.%subrel}
 
-%evr_tuple_select	1234
-%evr_tuple_order	EVTR
 %disttag		%{!?distsuffix:omv}%{?distsuffix}
 %distepoch		%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
+
+# The output binary package file name template used when building binary packages.
+# XXX: Note: escaped %% for use in headerSprintf()
+
+%_build_name_fmt	%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}-%%{DISTTAG}%%{DISTEPOCH}.%%{ARCH}.rpm
+
 
 # Dynamic EVRD tags macro for use with versioned provides/requires in place of
 # '%{version}-%{release}', ie. to automatically add distepoch or epoch if present
@@ -45,8 +50,13 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %_default_patch_flags	-U
 %_default_patch_fuzz	0
 
-%make			%{__make} %{_smp_mflags} -O
-%makeinstall_std	make DESTDIR=%{?buildroot:%{buildroot}} install INSTALL="install -p"
+%make \
+  echo "warning: %%make is deprecated, try %%make_build instead" 1>&2\
+  %{__make} %{_smp_mflags} -O
+
+%makeinstall_std \
+  echo "warning: %%makeinstall_std is deprecated, try %%make_install instead" 1>&2\
+  make DESTDIR=%{?buildroot:%{buildroot}} install INSTALL="install -p"
 
 %__lua			%{_bindir}/lua
 %__rc			%{_bindir}/rc
