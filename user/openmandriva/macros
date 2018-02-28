@@ -30,12 +30,12 @@
 # This will die as soon as remaining usage has been phased out...
 %mkrel(c:)		%{-c: 0.%{-c*}.}%{1}%{?subrel:.%subrel}
 
-%disttag		%{!?distsuffix:omv}%{?distsuffix}
-%distepoch		%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
+# For the built rpm filename format...
+%DISTTAG		%{!?distsuffix:omv}%{?distsuffix}
+%DISTEPOCH		%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
 
 # The output binary package file name template used when building binary packages.
 # XXX: Note: escaped %% for use in headerSprintf()
-
 %_build_name_fmt	%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}-%%{DISTTAG}%%{DISTEPOCH}.%%{ARCH}.rpm
 
 
