@@ -341,7 +341,7 @@ GCONF_CONFIG_SOURCE=`%{_gconftool_bin} --get-default-source` %{_gconftool_bin} -
     $CONFIGURE_XPATH
 
 %configure2_5x \
-  echo "%%configure2_5x is deprecated, please update the spec to use %%configure instead"; \
+  echo "%%configure2_5x is deprecated, please update the spec to use %%configure instead" >&2; \
   %configure
 
 %old_makeinstall \
@@ -463,3 +463,23 @@ grep $(readlink -f %{?!2:%{_libdir}}%{?2}/lib%{1}.so) | cut -f2 || echo %{name})
 [ -e %{?!2:%{_libdir}}%{?2}/lib%{1}.so ] && \
 objdump -p %{?!2:%{_libdir}}%{?2}/lib%{1}.so | grep -e SONAME | sed -e 's#.*\\\(lib.*\\\)\$#\\\1#g'\
 )
+
+#------------------------------------------------------------------------------
+# arch macros
+# arch macro for all EFI-compatible architectures
+%efi	%{ix86} x86_64 ia64 aarch64
+
+# macro that contains all arm archs, even 64 bit ones
+%armx	%arm aarch64
+
+# Get the base architecture (e.g. i386 for any x86, arm for any arm)
+#
+%_base_arch()	%(rpm --target='%1' -E '%%{_arch}' | tr -d '\n')
+
+# 1 if cross-compiling, 0 if doing a regular build
+# Note: In order to avoid ie. building for i586 on x86_64 being treated as if
+# cross-compiling, a check to see if base arch is listed with 'setarch --list'
+# is performed.
+#
+
+%cross_compiling	%(rm -f /tmp/rpm_cc_test 2>/dev/null; echo 'int main() { return 0; }' | %{__cc} %{optflags} -x c - -o /tmp/rpm_cc_test &>/dev/null; if /tmp/rpm_cc_test 2>/dev/null; then echo -n 0; else echo -n 1; fi; rm -f /tmp/rpm_cc_test 2>/dev/null)
