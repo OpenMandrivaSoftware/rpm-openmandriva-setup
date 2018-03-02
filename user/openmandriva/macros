@@ -86,6 +86,10 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %_binary_payload			w5.xzdio
 %_xz_threads				-1
 
+# Use SHA-256 for FILEDIGESTS instead of default MD5
+%_source_filedigest_algorithm 8
+%_binary_filedigest_algorithm 8
+
 %_duplicate_files_terminate_build	1
 %_unpackaged_subdirs_terminate_build	1
 %_files_listed_twice_terminate_build	1
