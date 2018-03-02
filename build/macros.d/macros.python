@@ -1,6 +1,6 @@
 # Python specific macro definitions.
 # To make use of these macros insert the following line into your spec file:
-# %{load:%{_usrlibrpm}/macros.d/python}
+# %{load:%{_rpmconfigdir}/macros.d/python}
 
 %__python	%{_bindir}/python
 

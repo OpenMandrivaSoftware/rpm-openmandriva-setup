@@ -1,6 +1,6 @@
 # SELinux specific macro definitions.
 # To make use of these macros insert the following line into your spec file:
-# %{load:%{_usrlibrpm}/macros.d/selinux}
+# %{load:%{_rpmconfigdir}/macros.d/selinux}
 #
 
 # Desired selinux policy tree
