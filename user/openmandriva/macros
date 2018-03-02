@@ -401,12 +401,6 @@ Internationalization and locale data for %{?1:%{1}}%{?!1:%{name}}\
 
 
 #------------------------------------------------------------------------------
-# Ocaml macro
-#
-
-%ocaml_sitelib %(if [ -x /usr/bin/ocamlc ]; then ocamlc -where;fi)/site-lib
-
-#------------------------------------------------------------------------------
 # Redefine RPM sections to allow jumping over them using "--without <section>".
 # This an interesting alternative to --short-circuit.
 # The following are mostly equivalent:
