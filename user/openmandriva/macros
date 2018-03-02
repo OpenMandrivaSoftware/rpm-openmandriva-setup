@@ -180,12 +180,6 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 #	(e.g. per-platform, per-system, per-packager, per-package) macros.
 #
 
-%debug_package_and_restore %{debug_package} \
-%package __restore__\
-Summary: %{summary}\
-Group: %{group}\
-%description __restore__
-
 %_arch_tag_suffix %([ "%{?_lib}" = "lib64" ] && echo "()(64bit)")
 %arch_tagged() %{1}%{_arch_tag_suffix} %{?2:%{2} %{3}%{?!3:%{error:undefined 3rd argument in arch_tagged}}}
 
@@ -383,7 +377,6 @@ GCONF_CONFIG_SOURCE=`%{_gconftool_bin} --get-default-source` %{_gconftool_bin} -
 %_package_i18n(g:f:) \
 %%package -n %{?1:%{1}}%{?!1:%{name}}-i18n\
 Summary: Internationalization and locale data for %{?1:%{1}}%{?!1:%{name}}\
-License: %{license}\
 Group: %{?-g:%{-g*}}%{?!-g:%{group}}\
 \
 %%description -n %{?1:%{1}}%{?!1:%{name}}-i18n\
@@ -470,5 +463,3 @@ grep $(readlink -f %{?!2:%{_libdir}}%{?2}/lib%{1}.so) | cut -f2 || echo %{name})
 [ -e %{?!2:%{_libdir}}%{?2}/lib%{1}.so ] && \
 objdump -p %{?!2:%{_libdir}}%{?2}/lib%{1}.so | grep -e SONAME | sed -e 's#.*\\\(lib.*\\\)\$#\\\1#g'\
 )
-
-%{load:/etc/rpm/macros.d/*.macros}
