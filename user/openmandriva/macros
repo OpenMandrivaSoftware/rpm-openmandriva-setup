@@ -139,7 +139,8 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 #
 %_enable_debug_packages 1
 %_include_minidebuginfo 1
-%_include_gdb_index     1
+# Wait until this actually exists
+#_include_gdb_index     1
 %_debugsource_packages  1
 %_debuginfo_subpackages 1
 
