@@ -23,12 +23,11 @@
 %mkrel(c:)		%{-c: 0.%{-c*}.}%{1}%{?subrel:.%subrel}
 
 # For the built rpm filename format...
-%DISTTAG		%{!?distsuffix:omv}%{?distsuffix}
-%DISTEPOCH		%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
+%disttag		%{!?distsuffix:omv}%{?distsuffix}%(sed -e 's#.*release\\ \\(\\S*\\).*#\\1#' /etc/release)
 
 # The output binary package file name template used when building binary packages.
 # XXX: Note: escaped %% for use in headerSprintf()
-%_build_name_fmt	%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}-%%{DISTTAG}%%{DISTEPOCH}.%%{ARCH}.rpm
+%_build_name_fmt	%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}-%%{DISTTAG}.%%{ARCH}.rpm
 
 
 # Dynamic EVRD tags macro for use with versioned provides/requires in place of
