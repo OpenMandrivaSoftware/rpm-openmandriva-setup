@@ -410,7 +410,8 @@ Internationalization and locale data for %{?1:%{1}}%{?!1:%{name}}\
 [ %{_with build} -eq 1 ] || exit 0 \
 %{nil}
 
-%install %%install \
+%install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}} \
+%%install \
 [ %{_with install} -eq 1 ] || exit 0 \
 %{nil}
 
