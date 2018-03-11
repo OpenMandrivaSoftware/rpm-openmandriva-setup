@@ -4,9 +4,6 @@
 
 %__python	%{_bindir}/python
 
-# Path to scripts to autogenerate python package dependencies,
-#
-
 %python_sitearch %(%{__python} -c "import os; from distutils.sysconfig import get_python_lib; lib=get_python_lib(1); print(os.path.islink(lib) and os.path.abspath(os.path.join(os.path.dirname(lib),os.readlink(lib))) or lib)")
 %python_sitelib	%(%{__python} -c "import os; from distutils.sysconfig import get_python_lib; lib=get_python_lib(); print(os.path.islink(lib) and os.path.abspath(os.path.join(os.path.dirname(lib),os.readlink(lib))) or lib)")
 %python_version	%(%{__python} -c "import sys; print(sys.version[0:3])")
@@ -42,3 +39,9 @@ find %1 -name '*.pyo' -exec rm -f {} \\; \
 
 %py_requires(d) \
 BuildRequires: %{__python} %{-d:python-devel}
+
+# Should python bytecompilation errors terminate a build?
+%_python_bytecompile_errors_terminate_build 1
+
+# Enable python bytecompilation
+%_python_bytecompile_build 1
