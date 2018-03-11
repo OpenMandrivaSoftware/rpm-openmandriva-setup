@@ -73,6 +73,9 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 
 %_systemdconfdir	%{_sysconfdir}/systemd
 
+%_logdir		%{_localstatedir}/log
+%_localedir		%{_datadir}/locale
+
 # use XZ to compress binary packages:
 %_binary_payload			w5.xzdio
 %_xz_threads				-1
