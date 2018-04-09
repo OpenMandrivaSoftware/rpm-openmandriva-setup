@@ -24,7 +24,7 @@ optflags: mipsel %{?__common_cflags:%{__common_cflags} -march=mips3 -mtune=loong
 optflags: ppc -O2 -g -m32 %{?!_disable_lto:-flto}
 optflags: ppc64 -O2 -g -m64 -mminimal-toc %{?!_disable_lto:-flto}
 
-optflags: x86_64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-O2 -g -m64 -mtune=generic} %{?!_disable_lto:-flto}
+optflags: x86_64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-O2 -g -m64 -mtune=generic} -mmmx -msse2 -msse3 -msse4.1 -msse4.2 %{?!_disable_lto:-flto}
 
 #############################################################
 # For a given uname().machine, the default build arch
