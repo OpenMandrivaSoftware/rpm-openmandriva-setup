@@ -114,7 +114,7 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %Werror_cflags -Wformat -Werror=format-security
 
 %_ssp_cflags -fstack-protector-strong --param=ssp-buffer-size=4 %{?_serverbuild_flags}
-%__common_cflags -Os %{debugcflags} -pipe %{Werror_cflags} %{?_fortify_cflags}
+%__common_cflags -Os %{debugcflags} -pipe %{Werror_cflags} %{?_fortify_cflags} -ffunction-sections -fdata-sections
 %__common_cflags_with_ssp %{__common_cflags} %{?_ssp_cflags}
 
 # Servers opt flags.
@@ -285,7 +285,7 @@ fi
 
 %__libtoolize_configure %{?__libtoolize:(cd $CONFIGURE_TOP; [ ! -f configure.in -a ! -f configure.ac ] || %{__libtoolize} --copy --force)}
 
-%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
+%ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags} -Wl,--gc-sections
 
 %setup_compile_flags \
   CC="${CC:-%__cc}" ; export CC ; \
