@@ -6,10 +6,13 @@ include: /usr/lib/rpm/rpmrc
 optflags: aarch64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
 
 optflags: armv6j %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv6j -mfpu=vfp -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
-optflags: armv7hl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_neon:-mfpu=neon} %{?!_disable_lto:-flto}
-optflags: armv7hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=hard -mfpu=neon}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
 optflags: armv7l %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
-optflags: armv8hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv8-a -mfloat-abi=hard -mfpu=neon}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: armv7hl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: armv7hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_neon:-mfpu=neon-vfpv4} %{?!_disable_lto:-flto}
+optflags: armv8l %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv8-a -mfloat-abi=softfp -mfpu=vfpv3-d16}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: armv8hl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv8-a -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: armv8hnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv8-a -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_neon:-mfpu=neon-vfpv4} %{?!_disable_lto:-flto}
+optflags: armv8hcnl %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv8-a+crypto -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_neon:-mfpu=neon-vfpv4} %{?!_disable_lto:-flto}
 
 optflags: i386 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i386 -mtune=generic -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 optflags: i486 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fomit-frame-pointer}%{!?__common_cflags_with_ssp:-O2 -g -m32} -march=i486 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
@@ -34,3 +37,8 @@ buildarchtranslate: geode: i686
 buildarchtranslate: pentium4: i686
 buildarchtranslate: pentium3: i686
 buildarchtranslate: i586: i686
+
+buildarchtranslate: armv8hcnl: armv7hnl
+buildarchtranslate: armv8hnl: armv7hnl
+buildarchtranslate: armv8hl: armv7hnl
+buildarchtranslate: armv7hl: armv7hnl
