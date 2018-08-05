@@ -269,7 +269,7 @@ fi
 
 %__os_install_post    \
     %{?__spec_helper_post}%{?!__spec_helper_post:/usr/share/spec-helper/spec-helper} \
-    %{!?__brp_python_bytecompile:[ %{?_python_bytecompile_build} -eq 1 ] && /usr/lib/rpm/brp-python-bytecompile %{__python} %{?_python_bytecompile_errors_terminate_build}} \
+    [ %{?_python_bytecompile_build} -eq 1 ] && %{__brp_python_bytecompile} \
     %{!?__brp_python_hardlink:/usr/lib/rpm/brp-python-hardlink} \
 %{nil}
 
