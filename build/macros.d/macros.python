@@ -37,6 +37,31 @@ find %1 -name '*.pyo' -exec rm -f {} \\; \
 
 %py_ocomp	%{__python} -O -c "import compileall; import sys; compileall.compile_dir(sys.argv[1], ddir=sys.argv[1][len('%{buildroot}'):])"
 
+%py_setup setup.py
+%py_shbang_opts -s
+
+%py_build() %{expand:\\\
+  CFLAGS="%{optflags}" %{__python} %{py_setup} %{?py_setup_args} build --executable="%{__python2} %{py_shbang_opts}" %{?*}
+  sleep 1
+}
+
+%py3_build %py_build
+
+%py_install() %{expand:\\\
+  CFLAGS="%{optflags}" %{__python} %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}
+}
+
+%py3_install %py_install
+
+%py2_build() %{expand:\\\
+  CFLAGS="%{optflags}" %{__python2} %{py_setup} %{?py_setup_args} build --executable="%{__python2} %{py_shbang_opts}" %{?*}
+  sleep 1
+}
+
+%py2_install() %{expand:\\\
+  CFLAGS="%{optflags}" %{__python2} %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}
+}
+
 %py_requires(d) \
 BuildRequires: %{__python} %{-d:python-devel}
 
