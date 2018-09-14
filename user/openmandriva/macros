@@ -58,21 +58,6 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 
 %_loop_detection_loglevel 4
 
-# mdvbz#62741
-# standard systemd directories
-%_systemdrootdir	/lib/systemd
-%_systemunitdir		%{_systemdrootdir}/system
-%_systemgeneratordir	%{_systemdrootdir}/system-generators
-%_systemshutdowndir	%{_systemdrootdir}/system-shutdown
-
-%_systemddatadir	%{_datadir}/systemd
-%_userunitdir		%{_systemddatadir}/user
-
-%_systemdlibexecdir	%{_libexecdir}/systemd
-%_usergeneratordir	%{_systemdlibexecdir}/user-generators
-
-%_systemdconfdir	%{_sysconfdir}/systemd
-
 %_logdir		%{_localstatedir}/log
 %_localedir		%{_datadir}/locale
 
@@ -139,7 +124,6 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 #_debugsource_packages  1
 %_debuginfo_subpackages 1
 
-
 #==============================================================================
 # ---- GPG/PGP/PGP5 signature macros.
 #	Macro(s) to hold the arguments passed to GPG/PGP for package
@@ -174,7 +158,6 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 
 # used by "git-repository--after-tarball":
 %git_repository_cache %{_topdir}/%{name}.git
-
 
 # Various programs used in rpm scripts
 %_update_desktop_database_bin %{_bindir}/update-desktop-database
