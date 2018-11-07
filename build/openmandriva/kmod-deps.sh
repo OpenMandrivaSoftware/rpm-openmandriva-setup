@@ -33,9 +33,9 @@ if [ $requires -eq 1 ]; then
 fi
 
 if [ $provides -eq 1 ]; then
-    provideslist=`sed "s/['\"]/\\\&/g"`
-    modulelist=$(echo "$provideslist" | egrep '^.*(/lib/modules/|/var/lib/dkms/).*\.ko(\.gz|\.xz)?$')
-    echo $modulelist | xargs -r $modinfo | \
+    provideslist="$(sed "s/['\"]/\\\&/g")"
+    modulelist=$(echo "$provideslist" | grep -E '^.*(/lib/modules/|/var/lib/dkms/).*\.ko(\.gz|\.xz)?$')
+    echo "$modulelist" | xargs -r $modinfo | \
 	perl -lne '
     $name = $1 if m!^filename:\s*(?:.*/)?([^/]+)\.k?o!;
     $ver = $1 if /^version:\s*[a-zA-Z]{0,6}\-?(\d+[\.\:\-\[\]]?\d*[\.\:\-\[\]]?\d*[\.\:\-\[\]]?\d*[\.\:\-\[\]]?\d*-?[a-zA-Z]{0,6}\d?).*/;
@@ -45,13 +45,13 @@ if [ $provides -eq 1 ]; then
 	undef $name; undef $ver;
     }
     '
-    dkmslist=$(echo "$provideslist" | egrep '(/var/lib/dkms-binary/[^/]+/[^/]+|/usr/src)/[^/]+/dkms.conf$')
+    dkmslist=$(echo "$provideslist" | grep -E '(/var/lib/dkms-binary/[^/]+/[^/]+|/usr/src)/[^/]+/dkms.conf$')
     [ -n "$dkmslist" ] && for d in $dkmslist; do
-	VERSION=`sed -rne 's/^PACKAGE_VERSION="?([^"]+)"?$/\1/;T;p' $d`
+	VERSION="$(sed -rne 's/^PACKAGE_VERSION="?([^"]+)"?$/\1/;T;p' $d)"
 	[ -z "$VERSION" ] && continue
-	PACKAGE_NAME=`sed -rne 's/^PACKAGE_NAME="?([^"]+)"?$/\1/;T;p' $d`
-	MODULES=`sed -rne 's/^DEST_MODULE_NAME\[[0-9]+\]="?([^"]+)"?$/\1/;T;p' $d`
-	[ -z "$MODULES" ] && MODULES=`sed -rne 's/^BUILT_MODULE_NAME\[[0-9]+\]="?([^"]+)"?$/\1/;T;p' $d`
+	PACKAGE_NAME="$(sed -rne 's/^PACKAGE_NAME="?([^"]+)"?$/\1/;T;p' $d)"
+	MODULES="$(sed -rne 's/^DEST_MODULE_NAME\[[0-9]+\]="?([^"]+)"?$/\1/;T;p' $d)"
+	[ -z "$MODULES" ] && MODULES="$(sed -rne 's/^BUILT_MODULE_NAME\[[0-9]+\]="?([^"]+)"?$/\1/;T;p' $d)"
 	# default on PACKAGE_NAME if no BUILT_MODULE_NAME is specified
 	[ -z "$MODULES" ] && MODULES=$PACKAGE_NAME
 	echo "$MODULES" | sed -re "s/\\\$PACKAGE_NAME/$PACKAGE_NAME/" | while read m; do
