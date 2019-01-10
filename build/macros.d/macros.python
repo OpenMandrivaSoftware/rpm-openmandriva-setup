@@ -41,7 +41,7 @@ find %1 -name '*.pyo' -exec rm -f {} \\; \
 %py_shbang_opts -s
 
 %py_build() %{expand:\\\
-  CFLAGS="%{optflags}" %{__python} %{py_setup} %{?py_setup_args} build --executable="%{__python2} %{py_shbang_opts}" %{?*}
+  CFLAGS="%{optflags}" %{__python} %{py_setup} %{?py_setup_args} build --executable="%{__python} %{py_shbang_opts}" %{?*}
   sleep 1
 }
 
