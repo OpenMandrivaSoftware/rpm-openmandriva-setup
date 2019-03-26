@@ -4,7 +4,7 @@ include: /usr/lib/rpm/rpmrc
 # Values for RPM_OPT_FLAGS for various platforms
 
 optflags: aarch64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
-optflags: riscv64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=rv64imafdc -mabi=lp64d}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
+optflags: riscv64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=rv64imafdc -mabi=lp64d}%{!?__common_cflags_with_ssp:-O2}
 
 optflags: armv6j %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv6j -mfpu=vfp -mfloat-abi=hard}%{!?__common_cflags_with_ssp:-O2 -g} %{?!_disable_lto:-flto}
 optflags: armv7l %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp} -fPIC -g -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16}%{!?__common_cflags_with_ssp:-O2} %{?!_disable_lto:-flto}
