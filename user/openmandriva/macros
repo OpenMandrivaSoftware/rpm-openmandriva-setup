@@ -269,6 +269,7 @@ fi
 %__libtoolize_configure %{?__libtoolize:(cd $CONFIGURE_TOP; [ ! -f configure.in -a ! -f configure.ac ] || %{__libtoolize} --copy --force)}
 
 %ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
+%__global_ldflags %ldflags
 
 %setup_compile_flags \
   CC="${CC:-%__cc}" ; export CC ; \
