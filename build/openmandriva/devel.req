@@ -12,9 +12,9 @@ export LC_ALL=C
 # --- Set needed to 0 for traditional find-requires behavior.
 needed=1
 
-for i in `echo $filelist | tr '[:blank:]' "\n" | egrep "(/usr)?/lib(|64)/[^/]+\.so$"`; do
-    objd=`objdump -p ${i} | grep SONAME`
-    lib64=`if file -L $i 2>/dev/null | grep "ELF 64-bit" >/dev/null; then echo "(64bit)"; fi` && \
+for i in $(echo $filelist | tr '[:blank:]' "\n" | egrep "(/usr)?/lib(|64)/[^/]+\.so$"); do
+    objd="$(objdump -p ${i} | grep SONAME)"
+    lib64=$(if file -L $i 2>/dev/null | grep "ELF 64-bit" >/dev/null; then echo "(64bit)"; fi) && \
     if [ -h ${i} -a -n "${objd}" ]; then
       if [ "$needed" -eq 0 ]; then
        ldd ${i} \
