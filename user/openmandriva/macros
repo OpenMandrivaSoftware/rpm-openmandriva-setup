@@ -519,4 +519,4 @@ objdump -p %{?!2:%{_libdir}}%{?2}/lib%{1}.so | grep -e SONAME | sed -e 's#.*\\\(
 # LEGACY RPM5 macro compatibility - packages using these need to be fixed!
 %_usrlibrpm %{_rpmconfigdir}
 %_etcrpm %{_sysconfdir}/rpm
-%_sys_macros_dir %{_etcrpm}/macros.d
+%_sys_macros_dir %{_rpmmacrodir}
