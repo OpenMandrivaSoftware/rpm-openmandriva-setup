@@ -177,6 +177,11 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 # clang generates incomplete debuginfo, so this doesn't work for now...
 #_debugsource_packages  1
 %_debuginfo_subpackages 1
+# Put build ID files into debug packages to save some space and FS cluttering
+# on normal systems. The problem Fedora tried to solve by putting the build ID
+# files into the main package (coinstallability for debuginfo packages on symbol server)
+# doesn't apply to us because we cannot run a debug symbol server.
+%_build_id_links alldebug
 
 #==============================================================================
 # ---- GPG/PGP/PGP5 signature macros.
