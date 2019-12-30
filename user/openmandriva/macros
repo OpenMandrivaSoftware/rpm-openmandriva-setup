@@ -48,6 +48,10 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
   echo "warning: %%makeinstall_std is deprecated, try %%make_install instead" 1>&2\
   make DESTDIR=%{?buildroot:%{buildroot}} install INSTALL="install -p"
 
+%apply_patches \
+  echo "warning: %%apply_patches is deprecated, try %%autopatch -p[01] instead" 1>&2\
+  %{autopatch -p1}
+
 %__lua %{_bindir}/lua
 %__rc %{_bindir}/rc
 %__xar %{_bindir}/xar
