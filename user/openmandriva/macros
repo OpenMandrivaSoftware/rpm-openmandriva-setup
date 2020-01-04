@@ -250,6 +250,9 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 %_webconfdir %{_sysconfdir}/httpd/conf
 %_webappconfdir %_webconfdir/webapps.d
 
+# For Appdata metainfo
+%_metainfodir %{_datadir}/metainfo
+
 #==============================================================================
 # ---- Build configuration macros.
 #
