@@ -257,6 +257,9 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 # For Appdata metainfo
 %_metainfodir %{_datadir}/metainfo
 
+# For backwards compatibility
+%_appdatadir %{_metainfodir}
+
 #==============================================================================
 # ---- Build configuration macros.
 #
