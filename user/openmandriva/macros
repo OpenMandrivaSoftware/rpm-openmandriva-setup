@@ -62,8 +62,8 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 
 %_fmoddir %{_libdir}/gfortran/modules
 
-# use XZ to compress binary packages:
-%_binary_payload w5.xzdio
+# use zstd to compress binary packages:
+%_binary_payload w19.zstdio
 %_xz_threads -1
 
 # Use SHA-256 for FILEDIGESTS instead of default MD5
@@ -83,8 +83,8 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %_enable_debug_packages 1
 
 # Default extension to use (for man & info files)
-%_extension .xz
-%_compress xz -0f --text -T0
+%_extension .zst
+%_compress zstd -f --rm -19 -T0
 
 # Macro: %{mklibname <name> [<major> [<minor>]] [-s] [-d]}
 # - %{mklibname test}               => lib64test, on a lib64 platform
