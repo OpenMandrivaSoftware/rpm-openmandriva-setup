@@ -16,6 +16,7 @@
 
 # mdvbz#64914
 %_rpmgio .ufdio
+%_rpmhome %getconfdir
 
 %__urlgetfile(url, dest) wget %1 -O %2 || (rm -f %2 && exit 1)
 
