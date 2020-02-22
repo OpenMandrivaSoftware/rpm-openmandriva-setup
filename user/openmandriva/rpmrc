@@ -19,7 +19,7 @@ optflags: i386 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__com
 optflags: i486 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m32 -march=i486 -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 optflags: i586 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m32 -march=i586 -mtune=atom -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 optflags: i686 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m32 -march=i686 -mtune=generic -msse -mfpmath=sse -fasynchronous-unwind-tables -mstackrealign %{?!_disable_lto:-flto}
-optflags: znver1_32 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m32 -march=znver1 -mtune=znver1 -mmmx -msse -msse2 -mssse3 -msse4a -msse4.1 -msse4.2 -mavx -mavx2 -msha -maes -mclflushopt -mfsgsbase -mrdrnd -mfma -mrdseed -mpopcnt -madx -mbmi -mbmi2 -mfxsr -mxsave -mxsaveopt -mxsavec -mxsaves -mmwaitx -mclzero -mfpmath=sse -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
+optflags: znver1_32 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -O3 -m32 -march=znver1 -mtune=znver1 -mmmx -msse -msse2 -mssse3 -msse4a -msse4.1 -msse4.2 -mavx -mavx2 -msha -maes -mclflushopt -mfsgsbase -mrdrnd -mfma -mrdseed -mpopcnt -madx -mbmi -mbmi2 -mfxsr -mxsave -mxsaveopt -mxsavec -mxsaves -mmwaitx -mclzero -mfpmath=sse -fasynchronous-unwind-tables %{?!_disable_lto:-flto}
 
 optflags: ia64 %{?__common_cflags:%{__common_cflags}}%{!?__common_cflags:-O2 -g} %{?!_disable_lto:-flto}
 
@@ -30,7 +30,7 @@ optflags: ppc %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__comm
 optflags: ppc64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m64 -mminimal-toc %{?!_disable_lto:-flto}
 
 optflags: x86_64 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m64 -mtune=generic %{?!_disable_lto:-flto}
-optflags: znver1 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -m64 -march=znver1 -mtune=znver1 -mmmx -msse -msse2 -mssse3 -msse4a -msse4.1 -msse4.2 -mavx -mavx2 -msha -maes -mclflushopt -mfsgsbase -mrdrnd -mfma -mrdseed -mpopcnt -madx -mbmi -mbmi2 -mfxsr -mxsave -mxsaveopt -mxsavec -mxsaves -mmwaitx -mclzero -mfpmath=sse %{?!_disable_lto:-flto}
+optflags: znver1 %{?__common_cflags_with_ssp:%{__common_cflags_with_ssp}}%{!?__common_cflags_with_ssp:-O2 -g} -O3 -m64 -march=znver1 -mtune=znver1 -mmmx -msse -msse2 -mssse3 -msse4a -msse4.1 -msse4.2 -mavx -mavx2 -msha -maes -mclflushopt -mfsgsbase -mrdrnd -mfma -mrdseed -mpopcnt -madx -mbmi -mbmi2 -mfxsr -mxsave -mxsaveopt -mxsavec -mxsaves -mmwaitx -mclzero -mfpmath=sse %{?!_disable_lto:-flto}
 
 #############################################################
 # For a given uname().machine, the default build arch
