@@ -57,3 +57,18 @@ BuildRequires: %{__python} %{-d:python-devel}
 
 # Enable python bytecompilation
 %_python_bytecompile_build 1
+
+# For migration from packages names "python-foo" to "python2-foo"
+%py2_migration_meta() \
+%define py2_migration_rn %(echo %{1} | sed -e 's,^python2-,python-,g' | grep '^python-') \
+%{expand:\
+Provides: %{py2_migration_rn} = %{EVRD} \
+Conflicts: %{py2_migration_rn} < %{EVRD} \
+Obsoletes: %{py2_migration_rn} < %{EVRD} \
+}
+
+# rosa2019.1+ names packages as python2-foo
+# rosa2016.1 names them as python-foo
+# Allow to name as %%python2-foo
+%python2 python2
+
