@@ -107,7 +107,7 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 # the corresponding variable names.
 %build_fflags %{optflags} -I%{_fmoddir}
 
-%build_ldflags %{optflags} -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
+%build_ldflags -Wl,-O2 %{?!_disable_ld_no_undefined: -Wl,--no-undefined} %{?!_disable_lto:-flto} %{?_hardened_flags}
 
 # Deprecated names.  For backwards compatibility only.
 %ldflags %build_ldflags
