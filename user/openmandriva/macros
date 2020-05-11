@@ -154,19 +154,17 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 # cf http://wiki.mandriva.com/en/Development/Packaging/Problems#format_not_a_string_literal_and_no_format_arguments
 %Werror_cflags -Wformat -Werror=format-security
 
-%_ssp_cflags -fstack-protector-strong --param=ssp-buffer-size=4 %{?_serverbuild_flags: %_serverbuild_flags}
+%_ssp_cflags -fstack-protector-all --param=ssp-buffer-size=4
 %__common_cflags -Os -fomit-frame-pointer %{debugcflags} -pipe %{Werror_cflags} %{?_fortify_cflags}
 %__common_cflags_with_ssp %{__common_cflags} %{?_ssp_cflags}
 
 # Servers opt flags.
 # Also set the env variables for backward compatibility (#32050).
-%serverbuild %define _serverbuild_flags -fstack-protector-all \
-export CFLAGS="%{optflags}"; export CXXFLAGS="%{optflags}"; export RPM_OPT_FLAGS="%{optflags}" \
-%{nil}
+# No longer useful since the flags are active always now...
+%serverbuild %{nil}
 
 # Hardened Servers opt flags.
 %serverbuild_hardened %define _hardened_flags -Wl,-z,now -pie \
-%serverbuild \
 export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export RPM_OPT_FLAGS="%{optflags} -fPIE" \
 %{nil}
 
