@@ -159,11 +159,11 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 %__common_cflags_with_ssp %{__common_cflags} %{?_ssp_cflags}
 
 # Servers opt flags.
-# Also set the env variables for backward compatibility (#32050).
 # No longer useful since the flags are active always now...
 %serverbuild %{nil}
 
 # Hardened Servers opt flags.
+# Also set the env variables for backward compatibility (#32050).
 %serverbuild_hardened %define _hardened_flags -Wl,-z,now -pie \
 export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export RPM_OPT_FLAGS="%{optflags} -fPIE" \
 %{nil}
