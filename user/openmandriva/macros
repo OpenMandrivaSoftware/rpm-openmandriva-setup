@@ -383,7 +383,9 @@ fi
 # Configure in 32-bit mode (-m32) on applicable platforms
 # FIXME CC=gcc CXX=g++ hardcode is because of a clang bug with -m32
 # handling. We apply the workaround here so we can undo it for all
-# packages in one run.
+# packages in one run. Stripping -flto is because our packages assume
+# shared libraries can be built with LTO, but clang does a much better
+# job at that than gcc.
 %configure32 \
   %before_configure ; \\\
   %{?_enable_libtoolize:%{?__libtoolize_configure:%{__libtoolize_configure};}} \\\
@@ -391,9 +393,9 @@ fi
 %if ! %{cross_compiling} \
   CC=gcc CXX=g++ \\\
 %endif \
-  CFLAGS="`echo $CFLAGS |sed -e 's, -m64,,g;s, -mx32,,g'` -m32" \\\
-  CXXFLAGS="`echo $CFLAGS |sed -e 's, -m64,,g;s, -mx32,,g'` -m32" \\\
-  LDFLAGS="`echo $LDFLAGS |sed -e 's, -m64,,g;s, -mx32,,g'` -m32" \\\
+  CFLAGS="`echo $CFLAGS |sed -e 's, -m64,,g;s, -mx32,,g;s, -flto,,g'` -m32" \\\
+  CXXFLAGS="`echo $CFLAGS |sed -e 's, -m64,,g;s, -mx32,,g;s, -flto,,g'` -m32" \\\
+  LDFLAGS="`echo $LDFLAGS |sed -e 's, -m64,,g;s, -mx32,,g;s, -flto,,g'` -m32" \\\
   CONFIGURE_XPATH="--x-includes=%{_prefix}/include --x-libraries=%{_prefix}/lib" \\\
   $CONFIGURE_TOP/configure $CROSSCOMPILE \\\
 	--disable-static \\\
