@@ -398,6 +398,7 @@ fi
   CXXFLAGS="`echo $CFLAGS |sed -e 's, -m64,,g;s, -mx32,,g;s, -flto,,g'` -m32" \\\
   LDFLAGS="`echo $LDFLAGS |sed -e 's, -m64,,g;s, -mx32,,g;s, -flto,,g'` -m32" \\\
   PKG_CONFIG_LIBDIR="%{_prefix}/lib/pkgconfig:%{_datadir}/pkgconfig:$PKG_CONFIG32_LIBDIR" \\\
+  PKG_CONFIG_PATH="%{_prefix}/lib/pkgconfig:%{_datadir}/pkgconfig:$PKG_CONFIG32_PATH" \\\
   CONFIGURE_XPATH="--x-includes=%{_prefix}/include --x-libraries=%{_prefix}/lib" \\\
   $CONFIGURE_TOP/configure $CROSSCOMPILE \\\
 	--disable-static \\\
