@@ -175,8 +175,7 @@ export CFLAGS="%{optflags} -fPIE"; export CXXFLAGS="%{optflags} -fPIE"; export R
 %_enable_debug_packages 1
 %_include_minidebuginfo 1
 %_include_gdb_index     1
-# clang generates incomplete debuginfo, so this doesn't work for now...
-#_debugsource_packages  1
+%_debugsource_packages  1
 %_debuginfo_subpackages 1
 # Put build ID files into debug packages to save some space and FS cluttering
 # on normal systems. The problem Fedora tried to solve by putting the build ID
