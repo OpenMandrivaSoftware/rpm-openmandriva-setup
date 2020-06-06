@@ -90,8 +90,8 @@ Provides:	%{1} = %{?2}%{!?2:%{EVRD}} \
 # - %{mklibname test}               => lib64test, on a lib64 platform
 # - %{mklibname test 1 -d}      => libtest1-devel
 # - %{mklibname test 1 -d 0 -s} => libtest1_0-static-devel
-%mklibname(ds)  %{_lib}%{1}%{!-d:%(if echo %{1} |rev |cut -b1 |grep -q '[0-9]'; then echo -n _; fi)}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}
-%mklib32name(ds)  lib%{1}%{!-d:%(if echo %{1} |rev |cut -b1 |grep -q '[0-9]'; then echo -n _; fi)}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}
+%mklibname(ds) %(echo "%{_lib}%{1}%{!-d:%(if echo %{1} | rev | cut -b1 | grep -q '[0-9]'; then echo -n _; fi)}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}" | sed -e 's,__,_,g' -e 's,_$,,g')
+%mklib32name(ds) %(echo "lib%{1}%{!-d:%(if echo %{1} | rev | cut -b1 | grep -q '[0-9]'; then echo -n _; fi)}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}" | sed -e 's,__,_,g' -e 's,_$,,g')
 
 #==============================================================================
 # ---- compiler flags.
